@@ -31,7 +31,7 @@ function Home({ styles }: HomeProp) {
     );
 }
 
-export default withStyles(({ color }: Theme): HomeStyle => ({
+export default withStyles(({ color }: typeof Theme): HomeStyle => ({
     Home: {
         backgroundColor: color.background,
         height: '100vh',

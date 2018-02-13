@@ -2,21 +2,20 @@ import ThemedStyleSheet from 'react-with-styles/lib/ThemedStyleSheet';
 import aphroditeInterface from 'react-with-styles-interface-aphrodite';
 import { css, withStyles } from 'react-with-styles';
 
-export interface Theme {
-    color: {
-        primary: string;
-        background: string;
-    };
-}
-
-export const ThemeBasic: Theme = {
+export const Theme = {
     color: {
         primary: '#f90',
         background: '#000',
+        fontPrimary: '#fff',
+    },
+
+    offset: {
+        mainLeft: 30,
+        mainRight: 30,
     },
 };
 
-ThemedStyleSheet.registerTheme(ThemeBasic);
+ThemedStyleSheet.registerTheme(Theme);
 ThemedStyleSheet.registerInterface(aphroditeInterface);
 
 export {
