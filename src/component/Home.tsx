@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { css, withStyles } from '../style';
+import { css, withStyles, Theme } from '../style';
 import HeadNav from './HeadNav';
 import Main from './Main';
 import BottomNav from './BottomNav';
@@ -16,7 +16,6 @@ export interface HomeProp {
 }
 
 function Home({ styles }: HomeProp) {
-    console.log(styles);
     return (
         <div {...css(styles.Home)}>
             <div {...css(styles.HeadNav)}>
@@ -32,8 +31,9 @@ function Home({ styles }: HomeProp) {
     );
 }
 
-export default withStyles((): HomeStyle => ({
+export default withStyles(({ color }: Theme): HomeStyle => ({
     Home: {
+        backgroundColor: color.background,
         height: '100vh',
         display: 'grid',
         gridTemplateColumns: 'auto',
@@ -53,5 +53,7 @@ export default withStyles((): HomeStyle => ({
     BottomNav: {
         gridRowStart: '3',
         gridRowEnd: '3',
+        margin: '0 20px',
+        borderTop: `1px solid ${color.primary}`,
     },
 }))(Home);
