@@ -1,9 +1,16 @@
 import * as React from 'react';
+import HeadNav from './HeadNav';
+import Main from './Main';
+import BottomNav from './BottomNav';
 
 class Home extends React.Component {
     render() {
         return (
-            <p>home</p>
+            <div>
+                <HeadNav />
+                <Main />
+                <BottomNav />
+            </div>
         );
     }
 }
