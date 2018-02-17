@@ -1,5 +1,7 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import * as faPlayCircle from '@fortawesome/fontawesome-free-regular/faPlayCircle';
 import { css, withStyles, Theme, ThemedStyleSheet } from '../style';
 
 interface EpisodeItemStyle {
@@ -50,6 +52,56 @@ const EpisodeItem = withStyles(({
         return (
             <li {...css(styles.Item, styleBgUrl)} onClick={(e) => onClick(episode)} />
         );
+    }
+});
+
+interface ControllerStyle {
+    Container: {};
+    ActionButton: {};
+    ActionIcon: {};
+}
+
+interface ControllerProp {
+    styles: ControllerStyle;
+    enabled: boolean;
+}
+
+const Controller = withStyles(({ color }: typeof Theme): ControllerStyle => ({
+    Container: {
+        display: 'flex',
+        width: '50%',
+        margin: '25px auto 0',
+        padding: 0,
+        flexDirection: 'row',
+        alignItems: 'center',
+        alignContent: 'center',
+    },
+
+    ActionButton: {
+        alignSelf: 'center',
+        margin: '0 auto',
+    },
+
+    ActionIcon: {
+        color: color.primary,
+    },
+}))(({ styles, enabled }: ControllerProp) => {
+    if (enabled) {
+        return (
+            <ul {...css(styles.Container)}>
+                <li {...css(styles.ActionButton)}>
+                    <a href="#">
+                        <FontAwesomeIcon
+                          icon={faPlayCircle}
+                          size="3x"
+                          {...css(styles.ActionIcon)}
+                        />
+                    </a>
+                </li>
+            </ul>
+        );
+    } else {
+        return null;
     }
 });
 
@@ -202,6 +254,7 @@ class Main extends React.Component<MainProp, MainState> {
                         {episodeItems}
                     </ul>
                 </div>
+                <Controller enabled={!!selectedEpisode} />
             </div>
         );
     }
