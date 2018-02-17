@@ -1,36 +1,122 @@
 import * as React from 'react';
-import { css, withStyles, Theme } from '../style';
+import { css, withStyles, Theme, ThemedStyleSheet } from '../style';
+
+interface EpisodeItemStyle {
+    EpisodeItem: {};
+    EpisodeItem__Highlight: {};
+}
+
+interface Episode {
+    Id: string;
+    Name: string;
+    Cover: string;
+}
+
+interface EpisodeItemProp {
+    styles: EpisodeItemStyle;
+    episode: Episode;
+    highlight?: boolean;
+}
+
+const EpisodeItem = withStyles(({
+    color,
+    EpisodeItem: { width, height, highlightWidth, highlightHeight, marginRight },
+}: typeof Theme): EpisodeItemStyle => ({
+    EpisodeItem: {
+        display: 'block',
+        width,
+        height,
+        marginRight,
+        border: `1px solid ${color.primary}`,
+    },
+
+    EpisodeItem__Highlight: {
+        width: highlightWidth,
+        height: highlightHeight,
+    },
+}))(({ styles, episode, highlight }: EpisodeItemProp) => {
+    if (highlight) {
+        return (
+            <li {...css(styles.EpisodeItem, styles.EpisodeItem__Highlight)}>{episode.Name}</li>
+        );
+    } else {
+        return (
+            <li {...css(styles.EpisodeItem)}>{episode.Name}</li>
+        );
+    }
+});
 
 export interface MainStyle {
     Container: {};
     EpisodeTitle: {};
     EpisodeListContainer: {};
     EpisodeList: {};
-    EpisodeItem: {};
-    EpisodeItem__Highlight: {};
 }
 
 export interface MainProp {
     styles: MainStyle;
 }
 
-function Main({ styles }: MainProp) {
-    return (
-        <div {...css(styles.Container)}>
-            <h1 {...css(styles.EpisodeTitle)}>Main</h1>
-            <div {...css(styles.EpisodeListContainer)}>
-                <ul {...css(styles.EpisodeList)}>
-                    <li {...css(styles.EpisodeItem)} />
-                    <li {...css(styles.EpisodeItem)} />
-                    <li {...css(styles.EpisodeItem)} />
-                    <li {...css(styles.EpisodeItem, styles.EpisodeItem__Highlight)} />
-                    <li {...css(styles.EpisodeItem)} />
-                    <li {...css(styles.EpisodeItem)} />
-                    <li {...css(styles.EpisodeItem)} />
-                </ul>
+export interface MainState {
+    selectedEpisode?: Episode;
+    episodes: Episode[];
+}
+
+class Main extends React.Component<MainProp, MainState> {
+
+    public constructor(props: MainProp) {
+        super(props);
+
+        this.state = {
+            episodes: [],
+        };
+    }
+
+    public componentDidMount() {
+        console.log('componentDidMount');
+    }
+
+    public render() {
+        const { selectedEpisode, episodes } = this.state;
+
+        const styles = this.props.styles;
+        const stylesEpisodeList = {
+            marginRight: 0,
+        };
+        const episodeItemWidth = ThemedStyleSheet.get().EpisodeItem.width;
+        const episodeListWidth = episodeItemWidth * episodes.length;
+        if (episodeListWidth <= window.innerWidth) {
+            stylesEpisodeList.marginRight = 0;
+        } else {
+            stylesEpisodeList.marginRight = -(episodeListWidth - episodeItemWidth);
+        }
+
+        const episodeItems = episodes.map((episode): JSX.Element => {
+            const key = `eps-${episode.Id}`;
+            const highlight = (selectedEpisode && episode.Id === selectedEpisode.Id);
+            return (
+                <EpisodeItem key={key} episode={episode} highlight={highlight} />
+            );
+        });
+
+        let title = '';
+        if (selectedEpisode) {
+            title = selectedEpisode.Name;
+        } else {
+            title = `${episodes.length} 个结果`;
+        }
+
+        return (
+            <div {...css(styles.Container)}>
+                <h1 {...css(styles.EpisodeTitle)}>{title}</h1>
+                <div {...css(styles.EpisodeListContainer)}>
+                    <ul {...css(styles.EpisodeList, stylesEpisodeList)}>
+                        {episodeItems}
+                    </ul>
+                </div>
             </div>
-        </div>
-    );
+        );
+    }
 }
 
 export default withStyles(({
@@ -61,19 +147,5 @@ export default withStyles(({
 
         overflow: 'hidden',
         whiteSpace: 'nowrap',
-        marginRight: '-999rem',  // TODO: calc on the fly
-    },
-
-    EpisodeItem: {
-        display: 'block',
-        width: 300,
-        height: 300,
-        marginRight: 15,
-        border: `1px solid ${color.primary}`,
-    },
-
-    EpisodeItem__Highlight: {
-        width: 350,
-        height: 350,
     },
 }))(Main);

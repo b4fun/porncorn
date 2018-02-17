@@ -13,6 +13,14 @@ export const Theme = {
         mainLeft: 30,
         mainRight: 30,
     },
+
+    EpisodeItem: {
+        marginRight: 15,
+        width: 300,
+        height: 300,
+        highlightWidth: 350,
+        highlightHeight: 350,
+    },
 };
 
 ThemedStyleSheet.registerTheme(Theme);
