@@ -1,9 +1,10 @@
 import * as React from 'react';
+import * as ReactDOM from 'react-dom';
 import { css, withStyles, Theme, ThemedStyleSheet } from '../style';
 
 interface EpisodeItemStyle {
-    EpisodeItem: {};
-    EpisodeItem__Highlight: {};
+    Item: {};
+    ItemHighlight: {};
 }
 
 interface Episode {
@@ -16,32 +17,38 @@ interface EpisodeItemProp {
     styles: EpisodeItemStyle;
     episode: Episode;
     highlight?: boolean;
+    onClick: (_: Episode) => void;
 }
 
 const EpisodeItem = withStyles(({
     color,
     EpisodeItem: { width, height, highlightWidth, highlightHeight, marginRight },
 }: typeof Theme): EpisodeItemStyle => ({
-    EpisodeItem: {
+    Item: {
         display: 'block',
         width,
         height,
         marginRight,
         border: `1px solid ${color.primary}`,
+        backgroundSize: 'cover',
     },
 
-    EpisodeItem__Highlight: {
+    ItemHighlight: {
         width: highlightWidth,
         height: highlightHeight,
     },
-}))(({ styles, episode, highlight }: EpisodeItemProp) => {
+}))(({ styles, episode, highlight, onClick }: EpisodeItemProp) => {
+    const styleBgUrl = {
+        background: `url(${episode.Cover})`,
+    };
+
     if (highlight) {
         return (
-            <li {...css(styles.EpisodeItem, styles.EpisodeItem__Highlight)}>{episode.Name}</li>
+            <li {...css(styles.Item, styles.ItemHighlight, styleBgUrl)} onClick={(e) => onClick(episode)} />
         );
     } else {
         return (
-            <li {...css(styles.EpisodeItem)}>{episode.Name}</li>
+            <li {...css(styles.Item, styleBgUrl)} onClick={(e) => onClick(episode)} />
         );
     }
 });
@@ -58,50 +65,131 @@ export interface MainProp {
 }
 
 export interface MainState {
+    loading: boolean;
     selectedEpisode?: Episode;
     episodes: Episode[];
 }
 
 class Main extends React.Component<MainProp, MainState> {
 
+    setSelectedEpisodeFn: (_: Episode) => void;
+
     public constructor(props: MainProp) {
         super(props);
 
         this.state = {
+            loading: false,
             episodes: [],
+        };
+
+        this.setSelectedEpisodeFn = (eps: Episode) => {
+            this.setState({
+                selectedEpisode: eps,
+            });
         };
     }
 
     public componentDidMount() {
-        console.log('componentDidMount');
+        this.setState({
+            loading: true,
+        });
+
+        setTimeout(
+            () => {
+                const episodes = [
+                    {
+                        Id: 'SOE-901',
+                        Name: 'SOE-901',
+                        Cover: 'https://img1.doubanio.com/icon/ul92463871-8.jpg',
+                    },
+                    {
+                        Id: 'SOE-902',
+                        Name: 'SOE-902',
+                        Cover: 'https://img1.doubanio.com/icon/ul92463871-8.jpg',
+                    },
+                    {
+                        Id: 'SOE-903',
+                        Name: 'SOE-903',
+                        Cover: 'https://img1.doubanio.com/icon/ul92463871-8.jpg',
+                    },
+                    {
+                        Id: 'SOE-904',
+                        Name: 'SOE-904',
+                        Cover: 'https://img1.doubanio.com/icon/ul92463871-8.jpg',
+                    },
+                    {
+                        Id: 'SOE-905',
+                        Name: 'SOE-905',
+                        Cover: 'https://img1.doubanio.com/icon/ul92463871-8.jpg',
+                    },
+                    {
+                        Id: 'SOE-906',
+                        Name: 'SOE-905',
+                        Cover: 'https://img1.doubanio.com/icon/ul92463871-8.jpg',
+                    },
+                    {
+                        Id: 'SOE-907',
+                        Name: 'SOE-905',
+                        Cover: 'https://img1.doubanio.com/icon/ul92463871-8.jpg',
+                    },
+                ];
+                this.setState({
+                    loading: false,
+                    selectedEpisode: episodes[0],
+                    episodes,
+                });
+            },
+            Math.ceil(Math.random() * 10000) / 10,
+        );
+    }
+
+    public componentDidUpdate() {
+        const selectedEpisode = this.state.selectedEpisode;
+        if (selectedEpisode) {
+            const node = ReactDOM.findDOMNode(this.refs[selectedEpisode.Id]);
+            if (node) {
+                node.scrollIntoView({ block: 'end', behavior: 'smooth' });
+            }
+        }
     }
 
     public render() {
-        const { selectedEpisode, episodes } = this.state;
+        const { selectedEpisode, episodes, loading } = this.state;
 
         const styles = this.props.styles;
         const stylesEpisodeList = {
             marginRight: 0,
         };
-        const episodeItemWidth = ThemedStyleSheet.get().EpisodeItem.width;
-        const episodeListWidth = episodeItemWidth * episodes.length;
+        const theme = ThemedStyleSheet.get();
+        let episodeListWidth = theme.EpisodeItem.width * episodes.length;
+        if (selectedEpisode) {
+            episodeListWidth = episodeListWidth - episodes.length + theme.EpisodeItem.highlightWidth;
+        }
         if (episodeListWidth <= window.innerWidth) {
             stylesEpisodeList.marginRight = 0;
         } else {
-            stylesEpisodeList.marginRight = -(episodeListWidth - episodeItemWidth);
+            stylesEpisodeList.marginRight = - (episodeListWidth - theme.EpisodeItem.width);
         }
 
         const episodeItems = episodes.map((episode): JSX.Element => {
             const key = `eps-${episode.Id}`;
             const highlight = (selectedEpisode && episode.Id === selectedEpisode.Id);
             return (
-                <EpisodeItem key={key} episode={episode} highlight={highlight} />
+                <EpisodeItem
+                  key={key}
+                  ref={episode.Id}
+                  episode={episode}
+                  highlight={highlight}
+                  onClick={this.setSelectedEpisodeFn}
+                />
             );
         });
 
         let title = '';
         if (selectedEpisode) {
             title = selectedEpisode.Name;
+        } else if (loading) {
+            title = '加载中...';
         } else {
             title = `${episodes.length} 个结果`;
         }
