@@ -15,6 +15,7 @@
     "react-scripts-ts": "2.13.0",
     "react-with-styles": "^3.0.0",
     "react-with-styles-interface-aphrodite": "^4.0.1",
+    "scroll-into-view-if-needed": "^1.4.0",
     "uninstall": "0.0.0"
   },
   "scripts": {

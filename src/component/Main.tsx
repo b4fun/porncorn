@@ -2,6 +2,7 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import * as faPlayCircle from '@fortawesome/fontawesome-free-regular/faPlayCircle';
+import scrollIntoViewIfNeeded from 'scroll-into-view-if-needed';
 import { css, withStyles, Theme, ThemedStyleSheet } from '../style';
 
 interface EpisodeItemStyle {
@@ -200,7 +201,14 @@ class Main extends React.Component<MainProp, MainState> {
         if (selectedEpisode) {
             const node = ReactDOM.findDOMNode(this.refs[selectedEpisode.Id]);
             if (node) {
-                node.scrollIntoView({ block: 'end', behavior: 'smooth' });
+                scrollIntoViewIfNeeded(node, {
+                    centerIfNeeded: true,
+                    duration: 150,
+                    easing: 'easeIn',
+                    offset: {
+                        right: 15,
+                    },
+                });
             }
         }
     }
@@ -233,6 +241,7 @@ class Main extends React.Component<MainProp, MainState> {
                   episode={episode}
                   highlight={highlight}
                   onClick={this.setSelectedEpisodeFn}
+                  onTouchEnd={this.setSelectedEpisodeFn}
                 />
             );
         });
